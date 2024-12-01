@@ -67,21 +67,38 @@ export default function Home() {
     }
 
     try {
-      // 서버로 데이터 전송 (실제 구현 필요)
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // 임시 지연
+      // API 엔드포인트로 데이터 전송
+      const response = await fetch("/api/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          occupation: formData.get("occupation"),
+          interest_reasons: formData.getAll("interest_reasons"),
+          detailed_reason: formData.get("detailed_reason"),
+          email: formData.get("email"),
+          social_support: formData.get("social_support") === "on",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("제출 실패");
+      }
+
       router.push("https://sumins.notion.site/cursor?pvs=4");
-    } catch (error) {
-      setErrors({ email: "제출 중 오류가 발생했습니다. 다시 시도해주세요." });
+    } catch {
+      alert("제출 중 오류가 발생했습니다. 다시 시도해주세요.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="min-h-screen p-8 pb-20 sm:p-20 font-[family-name:var(--font-geist-sans)]">
+    <div className="min-h-screen p-4 pb-20 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <main className="max-w-2xl mx-auto flex flex-col gap-8">
         <Image
-          className="rounded-md self-center sm:self-start"
+          className="rounded-md"
           src="/cursormatfia_color.png"
           alt="Cursor맛피아 로고"
           width={180}
@@ -89,10 +106,10 @@ export default function Home() {
           priority
         />
 
-        <div className="space-y-4 text-center sm:text-left">
+        <div className="space-y-4">
           <p>안녕하세요! Cursor맛피아입니다.</p>
           <p>제 교육자료에 관심 가져주셔서 감사합니다.</p>
-          <p>설문 제출해주시면 자료를 메일로 보내드립니다.</p>
+          <p>설문 제출해주시면 자료를 확인하실 수 있습니다.</p>
           <p className="text-sm text-gray-600 dark:text-gray-400">
             4주차중 1주차까지 완성된 상태이며, 나머지 내용은 매주 업데이트될
             예정입니다.
@@ -133,13 +150,15 @@ export default function Home() {
                   "뭐든 배워두면 좋을 것 같아서",
                 ].map((reason) => (
                   <div key={reason} className="flex items-center">
-                    <input
-                      type="checkbox"
-                      name="interest_reasons"
-                      value={reason}
-                      className="mr-2"
-                    />
-                    <label>{reason}</label>
+                    <label>
+                      <input
+                        type="checkbox"
+                        name="interest_reasons"
+                        value={reason}
+                        className="mr-2"
+                      />
+                      {reason}
+                    </label>
                   </div>
                 ))}
               </div>
@@ -170,8 +189,7 @@ export default function Home() {
 
             <div>
               <label className="block mb-2 font-bold">
-                이메일 주소를 입력해주세요
-                <span className="text-red-500 ml-1">*</span>
+                비슷한 교육자료 소식을 받아보시려면, 이메일 주소를 입력해주세요
               </label>
               <input
                 type="email"
@@ -187,35 +205,32 @@ export default function Home() {
 
             <div className="space-y-4">
               <div className="flex items-center">
-                <input type="checkbox" name="newsletter" className="mr-2" />
                 <label className="font-bold">
-                  비슷한 교육자료 소식을 받아보시겠어요?
-                </label>
-              </div>
-
-              <div className="flex items-center">
-                <input type="checkbox" name="social_support" className="mr-2" />
-                <label className="font-bold">
+                  <input
+                    type="checkbox"
+                    name="social_support"
+                    className="mr-2"
+                  />
                   스레드 게시물 하트+리포스트 부탁드립니다 ㅎㅎ
                 </label>
               </div>
             </div>
           </div>
-        </form>
 
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className={`w-full bg-foreground text-background rounded-full py-3 
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className={`w-full bg-foreground text-background rounded-full py-3 
               ${
                 isSubmitting
                   ? "opacity-50 cursor-not-allowed"
                   : "hover:opacity-90"
               }
               transition-opacity`}
-        >
-          {isSubmitting ? "제출 중..." : "제출하기"}
-        </button>
+          >
+            {isSubmitting ? "제출 중..." : "제출하기"}
+          </button>
+        </form>
 
         <div className="border-t pt-6">
           <button
@@ -244,7 +259,7 @@ export default function Home() {
                   </h3>
                   <ul className="list-disc pl-5 space-y-1">
                     <li>수집 항목: 이메일 주소</li>
-                    <li>이용 목적: 사용자 요청에 따른 자료 발송</li>
+                    <li>이용 목적: 교육 자료 안내 발송</li>
                     <li>
                       수집된 이메일 주소는 명시된 목적 외의 용도로 사용되지
                       않습니다.
@@ -256,14 +271,8 @@ export default function Home() {
                   <h3 className="font-bold mb-2">2. 개인정보의 보유 및 파기</h3>
                   <ul className="list-disc pl-5 space-y-1">
                     <li>
-                      일반 보유 기간: 수집된 개인정보는 자료 발송 후 1개월
-                      이내에 안전하게 파기됩니다.
-                    </li>
-                    <li>
-                      추가 자료 수신 동의 시: 사용자가 추가 자료 수신에 동의한
-                      경우, 이메일 주소는 동의일로부터 최대 1년간 보관됩니다.
-                      보관 기간 종료 시, 개인정보의 파기 여부 및 절차에 대해
-                      개별 안내를 드립니다.
+                      보유 기간: 수집된 개인정보는 동의일로부터 최대 1년간
+                      보관됩니다. 보관 기간 종료 시, 즉시 파기됩니다.
                     </li>
                   </ul>
                 </section>
