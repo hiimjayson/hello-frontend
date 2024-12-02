@@ -41,9 +41,11 @@ export default function Home() {
 
     // 이메일 검증
     const email = formData.get("email") as string;
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email || !emailRegex.test(email)) {
-      errors.email = "올바른 이메일 주소를 입력해주세요";
+    if (email !== "" && email != null) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!email || !emailRegex.test(email)) {
+        errors.email = "올바른 이메일 주소를 입력해주세요";
+      }
     }
 
     return errors;
