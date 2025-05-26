@@ -115,10 +115,6 @@ export default function Home() {
           <p>
             제출해주신 내용은 더 좋은 교육자료를 만들기 위해 참고할 예정입니다.
           </p>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            4주차중 2주차까지 완성된 상태이며, 나머지 내용은 매주 업데이트될
-            예정입니다.
-          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
