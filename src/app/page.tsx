@@ -290,10 +290,10 @@ export default function Home() {
                   <p className="mt-2">
                     문의 이메일:{" "}
                     <a
-                      href="mailto:hiimjaysondev@gmail.com"
+                      href="mailto:ceo@vooster.ai"
                       className="text-blue-600 dark:text-blue-400 hover:underline"
                     >
-                      hiimjaysondev@gmail.com
+                      ceo@vooster.ai
                     </a>
                   </p>
                 </section>
